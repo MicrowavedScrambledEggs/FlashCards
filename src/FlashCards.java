@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
@@ -30,14 +31,15 @@ public class FlashCards extends JFrame implements ActionListener,
     private ArrayList<Card> deck = new ArrayList<Card>();
     private File[] topicList;//array for list of topic directories
     private File[] paperList;//array for list of paper directories
-    private String[] topicNameList;//array for list of topic directories
-    private String[] paperNameList;//array for list of paper directories
+    private String[] topicNameList;//array for list of topic directory Strings
+    private String[] paperNameList;//array for list of paper directory Strings
     private File paperDir;//Directory of paper chosen
     private String paperTopicList = "";//name of file that contains the topic names of the paper chosen
     private File cardDir;//folder that contains all the cards for every paper
     
     private JButton draw;
     private JButton flip;
+    private JButton reshuffle;//TODO implement this!!
     private JButton add;
     private JButton remove;
     private JButton addAll;
@@ -46,6 +48,7 @@ public class FlashCards extends JFrame implements ActionListener,
     private JComboBox paperSelect;
     private JList topicsAvailable;
     private JList topicsSelected;
+    private DefaultListModel selectedModel;
     
     private final String drawCommand = "Draw";
     private final String flipCommand = "Flip";
@@ -73,8 +76,6 @@ public class FlashCards extends JFrame implements ActionListener,
         
         this.pack();
         this.setVisible(true);
-        
-        //this.pickPaper();
     }
 
 	private void setUpActionListener() {
@@ -109,7 +110,11 @@ public class FlashCards extends JFrame implements ActionListener,
         this.add = new JButton(addCommand);
         this.remove =  new JButton(removeCommand);
         this.addAll = new JButton(addAllCommand);
-        this.removeAll = new JButton(removeAllCommand);      
+        this.removeAll = new JButton(removeAllCommand);     
+        add.setEnabled(false);
+        remove.setEnabled(false);
+        addAll.setEnabled(false);
+        removeAll.setEnabled(false);
         buttonPanel.add(add);
         buttonPanel.add(remove);
         buttonPanel.add(addAll);
@@ -131,6 +136,8 @@ public class FlashCards extends JFrame implements ActionListener,
     	setUpPaperSelecter(topPanel);
     	this.draw = new JButton(drawCommand);
     	this.flip = new JButton(flipCommand);
+    	draw.setEnabled(false);
+    	flip.setEnabled(false);
     	topPanel.add(draw);
         topPanel.add(flip);
         add(topPanel, BorderLayout.NORTH);
@@ -202,14 +209,94 @@ public class FlashCards extends JFrame implements ActionListener,
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+		if(e.getActionCommand().equals(addCommand)){
+			addTopic(topicsAvailable.getSelectedIndex());
+		}
+		else if(e.getActionCommand().equals(removeCommand)){
+			removeTopic();
+		}
+		else if(e.getActionCommand().equals(removeAllCommand)){
+			selectedModel.removeAllElements();
+			deck = new ArrayList<Card>();
+			draw.setEnabled(false);
+			removeAll.setEnabled(false);
+		}
+		else if(e.getActionCommand().equals(drawCommand)){
+			
+		}
+		else if(e.getActionCommand().equals(addAllCommand)){
+			for(int i = 0; i < topicList.length; i++){
+				addTopic(i);
+			}				
+		}
+		
+		else {			
+			displayTopics(this.paperSelect.getSelectedIndex());
+		}
 		
 	}
 
+	private void removeTopic() {
+		int topicIndex = topicsSelected.getSelectedIndex();
+		String topicName = (String) selectedModel.get(topicIndex);
+		selectedModel.remove(topicIndex);
+		if(selectedModel.isEmpty()){
+			deck = new ArrayList<Card>();
+			draw.setEnabled(false);
+			removeAll.setEnabled(false);
+		} else {
+			ArrayList<Card> newDeck = new ArrayList<Card>(deck);
+			for(Card c : deck){
+				if(c.getTopic().equals(topicName)){
+					newDeck.remove(c);
+				}
+			}
+			deck = newDeck;
+		}
+	}
+
+	private void addTopic(int topicIndex) {
+		if(selectedModel == null){
+			selectedModel = new DefaultListModel();
+			topicsSelected.setModel(selectedModel); 
+		}
+		String topicName = topicNameList[topicIndex];
+		if(!selectedModel.contains(topicName)){
+			selectedModel.addElement(topicName);
+			loadTopicCards(topicList[topicIndex]);
+			draw.setEnabled(true);
+			removeAll.setEnabled(true);
+		}
+	}
+
+	private void displayTopics(int selectedPaperIndex) {
+		this.topicList = this.paperList[selectedPaperIndex].listFiles();
+		this.topicNameList = new String[topicList.length];
+         
+         for(int i = 0; i < topicList.length; i++){
+         	topicNameList[i] = topicList[i].getName();
+         }
+         
+         this.topicsAvailable.setListData(topicNameList);
+         this.addAll.setEnabled(true);
+	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		// TODO Auto-generated method stub
+		JList list = (JList)e.getSource();
+		if(list.equals(topicsAvailable)){
+			if(list.getSelectedIndex() == -1){
+				this.add.setEnabled(false);
+			} else {
+				this.add.setEnabled(true);
+			}
+		} else {
+			if(list.getSelectedIndex() == -1){
+				this.remove.setEnabled(false);
+			} else {
+				this.remove.setEnabled(true);
+			}
+		}
 		
 	}
 }
