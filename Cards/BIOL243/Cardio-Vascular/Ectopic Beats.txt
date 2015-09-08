@@ -1,0 +1,14 @@
+BIOL243
+Cardiovascular System
+Ectopic Beats
+
+Ectopic foci or premature contractions are caused by:
+
+ 	(1) Local areas of ischemia
+ 	(2) Calcified plaques
+ 	(3) Toxic irritation of A-V node, Purkinje system or 
+		myocardium by drugs like nicotine or caffeine
+
+After an extra beat, the heart is refactory, so it takes extra
+time before next contraction. This pause causes more blood to
+flow into the heat before the next beat.

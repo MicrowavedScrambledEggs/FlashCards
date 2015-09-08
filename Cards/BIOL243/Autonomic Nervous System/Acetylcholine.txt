@@ -1,0 +1,11 @@
+BIOL243
+Autonomic Nervous System
+Acetylcholine
+
+Neurotranmitter in brain and neurotransmitter for motor neurons.
+Binds to nicotinic receptors in ganglia to trigger firing of 
+postganglionic neuron. Also binds to muscarinic receptors in
+the parasympathetic nervous system
+
+Inhibiting acetycholine-estorase, which degrades acetylcholine,
+causes muscle tremors as muscles get over stimulated.

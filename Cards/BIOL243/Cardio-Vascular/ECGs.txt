@@ -1,0 +1,14 @@
+BIOL243
+Cardiovascular System
+ECGs
+
+Measure with 3 electrodes, one in left arm, one in right arm
+and one in a leg. 
+
+P wave: Atrial depolarization
+QRS wave: ventricular depolarization (Atrial repolarization
+            happens somewhere here)
+T wave: Ventricular repolarization
+
+P-R interval: 0.16 sec
+Q-T interval: 0.35 sec

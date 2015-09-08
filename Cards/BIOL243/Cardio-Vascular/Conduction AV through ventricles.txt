@@ -1,0 +1,17 @@
+BIOL243
+Cardiovascular System
+Conduction: AV through ventricles
+
+Need a moment in between atria contracting and ventricles 
+contracting to give time for blood to flow from the atria to 
+the ventricles. Decremental conduction in nodal region of AV 
+node. 0.1 s delay before impulse reaches the purkinje fibres.
+
+AV node has 
+ - Nodal region
+ - Bundle of His, which has automaticity
+
+Purkinje fibers have left and right branches for each ventricle.
+Purkinje fibers are posisioned such that the impulse through 
+them causes the ventricles to 'wring out' all the blood in them.
+

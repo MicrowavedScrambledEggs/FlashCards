@@ -1,0 +1,13 @@
+BIOL243
+Cardiovascular System
+Conduction: SA through Atria
+
+0.05 m/s conduction inside SA Node. 4 m/s conduction through 
+fibres in ventricle. 
+
+Internodal atrial pathways (from SA node through atrium to AV 
+node) has 1 m/s conduction. Makes both atria contract together.
+
+Nonconductive fibrous ring between the atria and the ventricles
+ensure that the only impulses from the atrium to the ventricle
+are via the AV node.

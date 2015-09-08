@@ -1,0 +1,22 @@
+BIOL243
+Cardiovascular System
+Cardiac Action Potentials
+
+A bit of a delay between the bump in action potential and bump
+in muscle tension. 
+
+Fast responce fibers.
+
+Potential difference: resting -80 mv
+
+Refractory period 200-250ms, 50x longer than skeletal muscles,
+to prevent other action potentials occuring. Starts with spike
+caused by sodium channels opening. Plateau that drags out 
+refractory period maintained by calcium channels. Ends with 
+calcium channels closing and potasium channels opening, taking
+it back to resting potential. 
+
+Slow Response fibers:
+
+Resting potential gradually increase untill threshold reached
+(from ~-55 mV to ~-35 mV). Then spike happens. 

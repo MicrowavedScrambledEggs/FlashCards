@@ -1,0 +1,18 @@
+BIOL243
+Cardiovascular System
+Atrial Paroxysmal Tachycardia
+
+Abnormal
+
+Paroxysmal means a series of rapid heart beats that suddenly 
+start and then suddenly stop.
+
+Can be stopped with a vagal reflex or quinidine or procainimide.
+(low dose beta block)
+
+P wave is inverted (goes down) if origin is near A-V node.
+
+Occurs by re-entrant pathways. Part of the atria are depolarised
+so get repolarised twice.
+
+Can cause dizzyness etc

@@ -1,0 +1,17 @@
+BIOL243
+Cardiovascular System
+Automaticity
+
+Heart cells can beat on their own (automaticity). Connected 
+cells beat at the rate of the cell with the fastest automaticity
+
+SA node has fastest automaticity of the heart (~100 bpm). 
+Hormone control etc stops the heart going at SA nodes rate all 
+the time. 
+
+AV node is next (40-60 bpm). This means it will take over if
+something wrong with SA node
+
+Ectopic focus is when another region of the heart beats faster 
+than the the pacemaker (SA node), therfore taking over control
+of heart rate and increasing it. Can be caused by drugs.

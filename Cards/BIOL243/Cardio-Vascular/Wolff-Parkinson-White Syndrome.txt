@@ -1,0 +1,16 @@
+BIOL243
+Cardiovascular System
+Wolff-Parkinson-White Syndrome
+
+Paroxysmal Supraventricular Tachycardia
+
+An extra connection or accessory pathway (short-circuit) that 
+allows electrical signals to bypass the atrioventricular node 
+and move from the atria to the ventricles faster than usual. 
+Impulses may also be transmitted from the ventricles back to the 
+atria.
+
+Could be caused by damage to the septal area.
+
+Reduces efficiency by causing ventricle to contract before
+atrium.  

@@ -1,0 +1,23 @@
+BIOL243
+Cardiovascular System
+SA Block and AV Block
+
+Automaticity in nodes are same but impulses from them are 
+blocked. Can be caused by Ischemia, scar tissue from an 
+infarct (tissue death), or excessive vagal stimulation 
+
+SA Block: No P waves. AV node takes over as pacemaker. Slower
+and more erratic heart rate
+
+AV Block: Impulses slowed through AV node and AV bundle. Can 
+also be caused by A-V nodal or A-V bundle inflammation.
+
+1st degree – prolonged PR interval (> 0.2 sec)
+
+2nd degree – intermittent e.g 2:1 or 3:1, etc (Occasional QRS 
+wave blocked)
+
+3rd degree – complete block with ‘ventricular escape’
+P waves are completely dissociated from QRST. Ventricle beat at
+the automaticity of its own pace maker (bundle of his)
+
