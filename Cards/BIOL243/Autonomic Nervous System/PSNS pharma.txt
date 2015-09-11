@@ -3,18 +3,18 @@ Autonomic Nervous System
 PSNS Pharmacology (Bonus)
 
 Parasympathomimetic drugs:
-	nicotine
-		activates nicotinic receptors
-	pilocarpine and methacholine
-		activates muscarinic receptors, 
-		causes e.g. profuse sweating
+    nicotine
+        activates nicotinic receptors
+    pilocarpine and methacholine
+        activates muscarinic receptors, 
+        causes e.g. profuse sweating
 
 Cholinesterase inhibitors
-	Neostigmine, physostigmine (eserine)
-		potentiates the effect of acetylcholine
+  Neostigmine, physostigmine (eserine)
+     potentiates the effect of acetylcholine
 
 Antimuscarinic drugs
-	Atropine (belladonna) and scopolamine
-		blocks the effect of acetylcholine on 
-		effector cells
-		causes pupillary dilation “belladonna”
+      Atropine (belladonna) and scopolamine
+      blocks the effect of acetylcholine on 
+       effector cells
+      causes pupillary dilation “belladonna”

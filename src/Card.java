@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.io.*;
 /**
  * Reads flash card files and makes Card objects out of them
- * 
+ *
  * @author: Badi James
  * @version: 1.0 (don't know version conventions
  */
@@ -22,31 +22,37 @@ public class Card
     {
         this.cardFile = cardFile;
         try{
-            Scanner sc =  new Scanner(this.cardFile);
-            this.paper = sc.nextLine();
-            this.topic = sc.nextLine();
-            this.subTopic = sc.nextLine();
+            FileReader sc =  new FileReader(this.cardFile);
+            BufferedReader rd = new BufferedReader(sc);
+            this.paper = rd.readLine();
+            this.topic = rd.readLine();
+            this.subTopic = rd.readLine();
+            sc.close();
         }
         catch(IOException e){
-//            UI.println("Card creation failed: " + e);
+            System.out.println("Card creation failed: " + e);
+        }
+        catch(NoSuchElementException e){
+        	System.out.println(cardFile.getName() + " not formated propery: " + e);
+        	throw e;
         }
     }
 
     /**
      * Gets the paper this flashcard is for
      * */
-  
+
     public String getPaper()
     {
         return this.paper;
     }
     /**Gets the topic of the card*/
-    
+
     public String getTopic(){
         return this.topic;
     }
     /**Gets the subtopic of the card*/
-    
+
     public String getSubtopic(){
         return this.subTopic;
     }
@@ -69,6 +75,7 @@ public class Card
 //                UI.drawString(sc.nextLine(), 50, printY);
                 printY += lnGap;
             }
+            sc.close();
         }
         catch(IOException e){
 //            UI.println("Card flipping failed: " + e);
