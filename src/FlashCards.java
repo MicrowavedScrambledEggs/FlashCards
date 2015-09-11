@@ -61,9 +61,10 @@ public class FlashCards extends JFrame implements ActionListener,
 
 
     /**
-     * Constructor for objects of class FlashCards. Sets up the buttons and initialises the card directory.
-     * Initialises the array of paper directories from the card directory's list of files. Starts the program
-     * off by asking the user to pick the paper they want to study
+     * Constructor for objects of class FlashCards. Sets up the buttons and initialises 
+     * the card directory. Initialises the array of paper directories from the card 
+     * directory's list of files. Starts the program off by asking the user to pick the 
+     * paper they want to study
      */
     public FlashCards()
     {	
@@ -80,6 +81,9 @@ public class FlashCards extends JFrame implements ActionListener,
         this.setVisible(true);
     }
 
+    /**
+     * Assigns event listeners to the buttons, combo boxes and lists  
+     */
 	private void setUpActionListener() {
 		draw.addActionListener(this);
         flip.addActionListener(this);
@@ -93,38 +97,60 @@ public class FlashCards extends JFrame implements ActionListener,
         topicsAvailable.addListSelectionListener(this);
         topicsSelected.addListSelectionListener(this);
 	}
-
+	
+	/**
+	 * Builds the topic selection panel with the JList of topics belonging to
+	 * the selected paper, the buttons for adding and removing topics, and the
+	 * JList of topics whose cards are currently in the deck
+	 */
 	private void setUpTopicSelection() {
 		JPanel topicSelectionPanel = new JPanel();
         topicSelectionPanel.setLayout(new GridLayout(1,3));
+        
+        //Build the JList for the selected paper's topics 
         this.topicsAvailable = new JList();
         JScrollPane availableScroll = new JScrollPane(topicsAvailable);
         topicSelectionPanel.add(availableScroll);
+        
         setUpTopicSelectionButtons(topicSelectionPanel);
+        
+        //Builds the JList for the selected topics
         this.topicsSelected = new JList();
         JScrollPane selectedScroll = new JScrollPane(topicsSelected);
-        topicSelectionPanel.add(selectedScroll);       
+        topicSelectionPanel.add(selectedScroll);
+        
         add(topicSelectionPanel, BorderLayout.WEST);
 	}
-
+	
+	/**
+	 * Adds the buttons for choosing which topics to include in deck
+	 * @param topicSelectionPanel Panel to add the buttons to
+	 */
 	private void setUpTopicSelectionButtons(JPanel topicSelectionPanel) {
+		//creates a panel for the buttons
 		JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(0,1));
+        buttonPanel.setLayout(new GridLayout(0,1));//vertical list
+        
         this.add = new JButton(addCommand);
         this.remove =  new JButton(removeCommand);
         this.addAll = new JButton(addAllCommand);
-        this.removeAll = new JButton(removeAllCommand);     
+        this.removeAll = new JButton(removeAllCommand);
+        //initialises buttons to disabled (need to select a paper before they can do anything)
         add.setEnabled(false);
         remove.setEnabled(false);
         addAll.setEnabled(false);
         removeAll.setEnabled(false);
+        
         buttonPanel.add(add);
         buttonPanel.add(remove);
         buttonPanel.add(addAll);
         buttonPanel.add(removeAll);
         topicSelectionPanel.add(buttonPanel);
 	}
-
+	
+	/**
+	 * Sets up an uneditable JEditorPane to display the text of the cards
+	 */
 	private void setUpCardDisplay() {
 		this.cardDisplay = new JEditorPane();
     	this.cardDisplay.setEditable(false);
