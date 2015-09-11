@@ -41,44 +41,53 @@ public class Card
     /**
      * Gets the paper this flashcard is for
      * */
-
     public String getPaper()
     {
         return this.paper;
     }
+    
     /**Gets the topic of the card*/
-
     public String getTopic(){
         return this.topic;
     }
+    
     /**Gets the subtopic of the card*/
-
     public String getSubtopic(){
         return this.subTopic;
     }
-    /**Prints on graphics pane the cards topic*/
-    public void printCard(){
-//        UI.clearGraphics();
-//        UI.drawString(this.topic, 100, 70);
-//        UI.drawString(this.subTopic, 100, 100);
+    
+    /**
+     * @return String containing the paper, topic and subtopic this card belongs to
+     */
+    public String getFront(){
+    	return String.format("%s\n\n%s\n\n%s", this.paper, this.topic, this.subTopic);
     }
+    
     /**Prints on graphics pane the cards contents*/
-    public void flipCard(){
-//        UI.clearGraphics();
-        int printY = 50;
-        int lnGap = 17;
+    public String getBack(){
+
         try{
-            Scanner sc =  new Scanner(this.cardFile);
-            sc.nextLine();
-            sc.nextLine();
-            while(sc.hasNext()){
-//                UI.drawString(sc.nextLine(), 50, printY);
-                printY += lnGap;
+            FileReader fr =  new FileReader(this.cardFile);
+            BufferedReader br = new BufferedReader(fr);
+            br.readLine();
+            br.readLine();
+            String back = br.readLine();
+            String toAdd = br.readLine();
+            while(toAdd != null){
+                back = String.format("%s\n%s", back, toAdd);
+                toAdd = br.readLine();
             }
-            sc.close();
+            fr.close();
+            return back;
         }
         catch(IOException e){
-//            UI.println("Card flipping failed: " + e);
+        	String toReturn = "ERROR: Reading of card file " + this.cardFile.getPath() 
+        			+ " failed: " + e;
+        	return toReturn;
+        }
+        catch(NoSuchElementException e){
+        	String toReturn = "ERROR: " + cardFile.getName() + " not formated propery: " + e;
+        	return toReturn;
         }
     }
 }

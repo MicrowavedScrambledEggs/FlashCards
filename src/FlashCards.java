@@ -48,10 +48,12 @@ public class FlashCards extends JFrame implements ActionListener,
     private JComboBox paperSelect;
     private JList topicsAvailable;
     private JList topicsSelected;
-    private DefaultListModel selectedModel;
+    private DefaultListModel<String> selectedTopicsStrings;
+    private DefaultListModel<File> selectedTopicsDirectories;
     
     private final String drawCommand = "Draw";
     private final String flipCommand = "Flip";
+    private final String reshuffleCommand = "Reshuffle";
     private final String addCommand = "Add >>";
     private final String removeCommand = "<< Remove";
     private final String addAllCommand = "Add All >>";
@@ -81,6 +83,7 @@ public class FlashCards extends JFrame implements ActionListener,
 	private void setUpActionListener() {
 		draw.addActionListener(this);
         flip.addActionListener(this);
+        reshuffle.addActionListener(this);
         paperSelect.addActionListener(this);
         add.addActionListener(this);
         remove.addActionListener(this);
@@ -132,14 +135,17 @@ public class FlashCards extends JFrame implements ActionListener,
     
     private void setUpTopPanel(){
     	JPanel topPanel = new JPanel();
-        topPanel.setLayout(new GridLayout(1,3));
+        topPanel.setLayout(new GridLayout(1,4));
     	setUpPaperSelecter(topPanel);
     	this.draw = new JButton(drawCommand);
     	this.flip = new JButton(flipCommand);
+    	this.reshuffle = new JButton(reshuffleCommand);
     	draw.setEnabled(false);
     	flip.setEnabled(false);
+    	reshuffle.setEnabled(false);
     	topPanel.add(draw);
         topPanel.add(flip);
+        topPanel.add(reshuffle);
         add(topPanel, BorderLayout.NORTH);
     }
     
@@ -147,13 +153,15 @@ public class FlashCards extends JFrame implements ActionListener,
     private void setUpPaperSelecter(JPanel topPanel) {
     	 this.cardDir = new File("Cards");
          this.paperList = this.cardDir.listFiles();
-         this.paperNameList = new String[paperList.length];
+         this.paperNameList = new String[paperList.length+2];
          
          for(int i = 0; i < paperList.length; i++){
          	paperNameList[i] = paperList[i].getName();
          }
-         
+         paperNameList[paperList.length] = "----------------";
+         paperNameList[paperList.length+1] = "Select the paper you want to study here";
          this.paperSelect = new JComboBox(paperNameList);
+         this.paperSelect.setSelectedIndex(paperNameList.length - 1);
          topPanel.add(paperSelect);
 	}
     
@@ -187,7 +195,7 @@ public class FlashCards extends JFrame implements ActionListener,
     		pick = (int) (Math.random() * this.deck.size());
     	}
     	this.currentCard = this.deck.get(pick);
-    	this.currentCard.printCard();    
+    	this.cardDisplay.setText(currentCard.getFront());  
 
     }
     
@@ -196,9 +204,9 @@ public class FlashCards extends JFrame implements ActionListener,
      */
     private void flip(){
         if(this.currentCard == null){
-//            UI.println("Need to draw a card first");
+            this.cardDisplay.setText("Need to draw a card first");
         } else {
-            this.currentCard.flipCard();
+            this.cardDisplay.setText(currentCard.getBack());
             this.deck.remove(this.currentCard); 
         }
     }
@@ -216,13 +224,26 @@ public class FlashCards extends JFrame implements ActionListener,
 			removeTopic();
 		}
 		else if(e.getActionCommand().equals(removeAllCommand)){
-			selectedModel.removeAllElements();
+			selectedTopicsStrings.removeAllElements();
 			deck = new ArrayList<Card>();
 			draw.setEnabled(false);
+			reshuffle.setEnabled(false);
 			removeAll.setEnabled(false);
 		}
 		else if(e.getActionCommand().equals(drawCommand)){
-			
+			draw();
+			flip.setEnabled(true);
+		}
+		else if(e.getActionCommand().equals(flipCommand)){
+			flip();
+			flip.setEnabled(false);
+			if(deck.isEmpty()){
+				draw.setEnabled(false);
+			}
+		}
+		else if(e.getActionCommand().equals(reshuffleCommand)){
+			rebuildDeck();
+			draw.setEnabled(true);
 		}
 		else if(e.getActionCommand().equals(addAllCommand)){
 			for(int i = 0; i < topicList.length; i++){
@@ -230,19 +251,33 @@ public class FlashCards extends JFrame implements ActionListener,
 			}				
 		}
 		
-		else {			
-			displayTopics(this.paperSelect.getSelectedIndex());
+		else {
+			if(paperSelect.getSelectedIndex() < paperList.length){
+				displayTopics(this.paperSelect.getSelectedIndex());
+			}
+		}
+		
+	}
+
+	private void rebuildDeck() {
+		if(!selectedTopicsDirectories.isEmpty()){
+			deck = new ArrayList<Card>();
+			for(int i = 0; i < selectedTopicsDirectories.getSize(); i++){
+				loadTopicCards(selectedTopicsDirectories.get(i));
+			}
 		}
 		
 	}
 
 	private void removeTopic() {
 		int topicIndex = topicsSelected.getSelectedIndex();
-		String topicName = (String) selectedModel.get(topicIndex);
-		selectedModel.remove(topicIndex);
-		if(selectedModel.isEmpty()){
+		String topicName = (String) selectedTopicsStrings.get(topicIndex);
+		selectedTopicsStrings.remove(topicIndex);
+		selectedTopicsDirectories.remove(topicIndex);
+		if(selectedTopicsStrings.isEmpty()){
 			deck = new ArrayList<Card>();
 			draw.setEnabled(false);
+			reshuffle.setEnabled(false);
 			removeAll.setEnabled(false);
 		} else {
 			ArrayList<Card> newDeck = new ArrayList<Card>(deck);
@@ -256,15 +291,18 @@ public class FlashCards extends JFrame implements ActionListener,
 	}
 
 	private void addTopic(int topicIndex) {
-		if(selectedModel == null){
-			selectedModel = new DefaultListModel();
-			topicsSelected.setModel(selectedModel); 
+		if(selectedTopicsStrings == null){
+			selectedTopicsStrings = new DefaultListModel<String>();
+			selectedTopicsDirectories = new DefaultListModel<File>();
+			topicsSelected.setModel(selectedTopicsStrings); 
 		}
 		String topicName = topicNameList[topicIndex];
-		if(!selectedModel.contains(topicName)){
-			selectedModel.addElement(topicName);
+		if(!selectedTopicsStrings.contains(topicName)){
+			selectedTopicsStrings.addElement(topicName);
+			selectedTopicsDirectories.addElement(topicList[topicIndex]);
 			loadTopicCards(topicList[topicIndex]);
 			draw.setEnabled(true);
+			reshuffle.setEnabled(true);
 			removeAll.setEnabled(true);
 		}
 	}
