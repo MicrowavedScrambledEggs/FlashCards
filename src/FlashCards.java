@@ -40,7 +40,7 @@ public class FlashCards extends JFrame implements ActionListener,
     
     private JButton draw;
     private JButton flip;
-    private JButton reshuffle;//TODO implement this!!
+    private JButton reshuffle;
     private JButton add;
     private JButton remove;
     private JButton addAll;

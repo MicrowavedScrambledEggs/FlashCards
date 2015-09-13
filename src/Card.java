@@ -1,6 +1,4 @@
 import java.util.*;
-
-import java.awt.Color;
 import java.io.*;
 /**
  * Reads flash card files and makes Card objects out of them
