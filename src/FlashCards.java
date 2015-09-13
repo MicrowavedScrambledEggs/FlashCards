@@ -36,6 +36,7 @@ public class FlashCards extends JFrame implements ActionListener,
     private File paperDir;//Directory of paper chosen
     private String paperTopicList = "";//name of file that contains the topic names of the paper chosen
     private File cardDir;//folder that contains all the cards for every paper
+    private final String cardDirName = "Cards";//Name of folder that contains all the cards
     
     private JButton draw;
     private JButton flip;
@@ -159,41 +160,61 @@ public class FlashCards extends JFrame implements ActionListener,
     	add(cardScroll, BorderLayout.EAST);
 	}
     
+	/**
+	 * Sets up the top panel with the combo box for paper selection, and the buttons for
+	 * drawing and flipping cards, and reshuffling the deck
+	 */
     private void setUpTopPanel(){
     	JPanel topPanel = new JPanel();
-        topPanel.setLayout(new GridLayout(1,4));
+        topPanel.setLayout(new GridLayout(1,4));//One row
+        
     	setUpPaperSelecter(topPanel);
+    	
+    	//Build and add buttons
     	this.draw = new JButton(drawCommand);
     	this.flip = new JButton(flipCommand);
     	this.reshuffle = new JButton(reshuffleCommand);
+    	//Initialise these card and deck interaction buttons to disabled
+    	//(need to build a deck before these buttons can do anything)
     	draw.setEnabled(false);
     	flip.setEnabled(false);
     	reshuffle.setEnabled(false);
     	topPanel.add(draw);
         topPanel.add(flip);
         topPanel.add(reshuffle);
+        
         add(topPanel, BorderLayout.NORTH);
     }
     
-    
+    /**
+     * Builds the combo box for selecting papers and adds it to the given panel
+     * @param topPanel Panel to add combo box to
+     */
     private void setUpPaperSelecter(JPanel topPanel) {
-    	 this.cardDir = new File("Cards");
+    	//Retrieves the directories of each paper's folder
+    	 this.cardDir = new File(cardDirName);
          this.paperList = this.cardDir.listFiles();
-         this.paperNameList = new String[paperList.length+2];
          
+         //Builds the String array for the combo box fro the names of the paper folders
+         this.paperNameList = new String[paperList.length+2];
          for(int i = 0; i < paperList.length; i++){
          	paperNameList[i] = paperList[i].getName();
          }
+         //Cosmetic and for ease of use. Dud selections to show function of combo box
          paperNameList[paperList.length] = "----------------";
          paperNameList[paperList.length+1] = "Select the paper you want to study here";
          this.paperSelect = new JComboBox(paperNameList);
          this.paperSelect.setSelectedIndex(paperNameList.length - 1);
+         
          topPanel.add(paperSelect);
 	}
     
     /**
-     * Goes through a paper directory, going into every topic folder, creates card objects from the text 
-     * files and adds them to the deck
+     * Goes through a paper directory, going into every topic folder, creates card objects from 
+     * the text files and adds them to the deck
+     * 
+     * Currently not in use ("Add All" logic fulfills this purpose) but might be useful for 
+     * future versions
      */
     private void loadAllCardsForPaper(){
         for(int i = 0; i < this.topicList.length; i++){
@@ -202,7 +223,8 @@ public class FlashCards extends JFrame implements ActionListener,
     }
     
     /**
-     * Goes through a topic folder, creates card objects from the text files and adds them to the deck
+     * Goes through a topic folder, creates card objects from the text files and adds them to 
+     * the deck
      */
     private void loadTopicCards(File topicDir){
         File[] topicCards = topicDir.listFiles();
@@ -212,8 +234,8 @@ public class FlashCards extends JFrame implements ActionListener,
     }
     
     /**
-     * Draws a random card from the deck. Sets that card to the current card and prints the 'back' of it
-     * (the card's name and the topic it belongs to) in the graphics area.
+     * Draws a random card from the deck. Sets that card to the current card and prints the 
+     * 'front' of it (the card's name and the topic it belongs to) to the card display area.
      */
     private void draw(){
     	int pick = (int) (Math.random() * this.deck.size());
@@ -226,7 +248,8 @@ public class FlashCards extends JFrame implements ActionListener,
     }
     
     /**
-     * Prints the current cards info in the graphics area, then removes it from the deck.
+     * Prints the 'back' of the current card (the description of its subtopic) to the card 
+     * display area, then removes it from the deck.
      */
     private void flip(){
         if(this.currentCard == null){
@@ -250,11 +273,7 @@ public class FlashCards extends JFrame implements ActionListener,
 			removeTopic();
 		}
 		else if(e.getActionCommand().equals(removeAllCommand)){
-			selectedTopicsStrings.removeAllElements();
-			deck = new ArrayList<Card>();
-			draw.setEnabled(false);
-			reshuffle.setEnabled(false);
-			removeAll.setEnabled(false);
+			removeAllTopics();
 		}
 		else if(e.getActionCommand().equals(drawCommand)){
 			draw();
@@ -275,8 +294,7 @@ public class FlashCards extends JFrame implements ActionListener,
 			for(int i = 0; i < topicList.length; i++){
 				addTopic(i);
 			}				
-		}
-		
+		}		
 		else {
 			if(paperSelect.getSelectedIndex() < paperList.length){
 				displayTopics(this.paperSelect.getSelectedIndex());
@@ -284,28 +302,53 @@ public class FlashCards extends JFrame implements ActionListener,
 		}
 		
 	}
-
+	
+	/**
+	 * Clears the selected topic JList and empties the deck
+	 */
+	private void removeAllTopics() {
+		selectedTopicsStrings.removeAllElements();
+		selectedTopicsDirectories.removeAllElements();
+		deck = new ArrayList<Card>();
+		draw.setEnabled(false);
+		reshuffle.setEnabled(false);
+		removeAll.setEnabled(false);
+	}
+	
+	/**
+	 * Rebuilds the deck with the selected topics. Used for re-adding all the flipped cards
+	 * of the current deck
+	 */
 	private void rebuildDeck() {
 		if(!selectedTopicsDirectories.isEmpty()){
 			deck = new ArrayList<Card>();
 			for(int i = 0; i < selectedTopicsDirectories.getSize(); i++){
 				loadTopicCards(selectedTopicsDirectories.get(i));
 			}
-		}
-		
+		}	
 	}
-
+	
+	/**
+	 * Removes the currently selected topic in the selected topic JList from the selected 
+	 * topic JList. Removes all cards from that topic from the deck
+	 */
 	private void removeTopic() {
+		//Get the selected topic's name
 		int topicIndex = topicsSelected.getSelectedIndex();
-		String topicName = (String) selectedTopicsStrings.get(topicIndex);
+		String topicName = selectedTopicsStrings.get(topicIndex);
+		
+		//Remove that topic from the selected topic JList
 		selectedTopicsStrings.remove(topicIndex);
 		selectedTopicsDirectories.remove(topicIndex);
+		
 		if(selectedTopicsStrings.isEmpty()){
+			//Clears the deck completely, now that there are no topics
 			deck = new ArrayList<Card>();
 			draw.setEnabled(false);
 			reshuffle.setEnabled(false);
 			removeAll.setEnabled(false);
 		} else {
+			//Creates a replacement deck with all the cards from that topic removed
 			ArrayList<Card> newDeck = new ArrayList<Card>(deck);
 			for(Card c : deck){
 				if(c.getTopic().equals(topicName)){
@@ -315,15 +358,25 @@ public class FlashCards extends JFrame implements ActionListener,
 			deck = newDeck;
 		}
 	}
-
+	
+	/**
+	 * Adds the topic in the topics available JList at the given index to the selected topics 
+	 * JList, and the topic's cards to the deck
+	 * @param topicIndex Index of selected topic in the topics available JList
+	 */
 	private void addTopic(int topicIndex) {
 		if(selectedTopicsStrings == null){
+			//if this is the first time a topic has been selected
+			//initialises the list models for the selected topics JList
 			selectedTopicsStrings = new DefaultListModel<String>();
 			selectedTopicsDirectories = new DefaultListModel<File>();
 			topicsSelected.setModel(selectedTopicsStrings); 
 		}
+		
 		String topicName = topicNameList[topicIndex];
 		if(!selectedTopicsStrings.contains(topicName)){
+			//if selected topic is not already in the selected topics JList
+			//Adds the topic to the selected topic's JList, and its cards to the deck
 			selectedTopicsStrings.addElement(topicName);
 			selectedTopicsDirectories.addElement(topicList[topicIndex]);
 			loadTopicCards(topicList[topicIndex]);
@@ -332,11 +385,18 @@ public class FlashCards extends JFrame implements ActionListener,
 			removeAll.setEnabled(true);
 		}
 	}
-
+	
+	/**
+	 * Sets the topics available JList to contain and display the names of the topics of the
+	 * selected paper
+	 * @param selectedPaperIndex Index of selected paper in combo box of paper names
+	 */
 	private void displayTopics(int selectedPaperIndex) {
+		//build array of topic directories for paper
 		this.topicList = this.paperList[selectedPaperIndex].listFiles();
-		this.topicNameList = new String[topicList.length];
-         
+		
+		//Build array of topic names, from topic directory array
+		this.topicNameList = new String[topicList.length];    
          for(int i = 0; i < topicList.length; i++){
          	topicNameList[i] = topicList[i].getName();
          }
@@ -344,9 +404,11 @@ public class FlashCards extends JFrame implements ActionListener,
          this.topicsAvailable.setListData(topicNameList);
          this.addAll.setEnabled(true);
 	}
-
+	
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
+		//Enables or disables add and remove buttons depending of what was selected in what
+		//list
 		JList list = (JList)e.getSource();
 		if(list.equals(topicsAvailable)){
 			if(list.getSelectedIndex() == -1){
