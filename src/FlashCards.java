@@ -1,12 +1,11 @@
 import java.util.*;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.URISyntaxException;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -16,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 /**
@@ -51,6 +51,16 @@ ListSelectionListener
 	private JList topicsSelected;
 	private DefaultListModel<String> selectedTopicsStrings;
 	private DefaultListModel<File> selectedTopicsDirectories;
+	
+	private TopicSelectionPanel topicSelectionPanel;
+	private JPanel topicButtonPanel;
+	private JScrollPane cardDisplayPane;
+	private JSplitPane topicCardSplitPane;
+	private int topicListWidth = 175;
+	private int topicButtonWidth = 100;
+	private int topicSelectionWidth = topicListWidth*2 + topicButtonWidth;
+	private int cardDisplayWidth = 300;
+	private int topicCardHeight = 500;
 
 	private final String drawCommand = "Draw";
 	private final String flipCommand = "Flip";
@@ -58,7 +68,7 @@ ListSelectionListener
 	private final String addCommand = "Add >>";
 	private final String removeCommand = "<< Remove";
 	private final String addAllCommand = "Add All >>";
-	private final String removeAllCommand = "<< Remove All";
+	private final String removeAllCommand = "<html>Remove<br>&lt&lt All</html>";
 
 
 	/**
@@ -72,14 +82,61 @@ ListSelectionListener
 		super("Flash Cards");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
-
-		setUpTopPanel();
-		setUpCardDisplay();
-		setUpTopicSelection();        
-		setUpActionListener();
+		
+		if(findCards()){
+			setUpTopPanel();
+			setUpCardDisplayAndTopicSelection();      
+			setUpActionListener();
+		}
 
 		this.pack();
 		this.setVisible(true);
+	}
+	
+	/**
+	 * Sets up the JSplitPane containing the Topic selection lists and buttons on one side and
+	 * the card display on the other side
+	 */
+	private void setUpCardDisplayAndTopicSelection() {
+		setUpCardDisplay();
+		setUpTopicSelection();  
+		topicCardSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, topicSelectionPanel,
+				cardDisplayPane);
+		topicCardSplitPane.setDividerLocation(topicSelectionWidth);
+		add(topicCardSplitPane);
+	}
+
+	/**
+	 * Searches in the parent of the directory the program is running in for the card directory
+	 * @return True if successfully found Card folder
+	 */
+	private boolean findCards() {
+		try {
+			//find the program's running directory and it's parent directory
+			File runningDirectory = new File(FlashCards.class.getProtectionDomain()
+					.getCodeSource().getLocation().toURI().getPath());
+			runningDirectory = runningDirectory.getParentFile();
+			
+			//searches through the parent directory for the card folder
+			File[] runDirectoryContents = runningDirectory.listFiles();
+			for(int i = 0; i < runDirectoryContents.length; i++){
+				if(runDirectoryContents[i].getName().equals(cardDirName)){
+					this.cardDir = runDirectoryContents[i];
+					return true;
+				}
+			}
+			//if it couldn't find the card folder, displays an error on the UI
+			add(new ErrorPanel("<html><b>ERROR:</b> Card directory not in running directory"
+					+ "<br>Make sure folder \"" + cardDirName + "\" is in same folder as "
+					+ "FlashCards program</html>"));
+			return false;
+			
+		} catch (URISyntaxException e) {
+			add(new ErrorPanel("<html><b>ERROR:</b> when finding program directory to find "
+					+ "cards:<br>" + e.getMessage() +"</html>"));
+			return false;
+		}
+		
 	}
 
 	/**
@@ -105,32 +162,34 @@ ListSelectionListener
 	 * JList of topics whose cards are currently in the deck
 	 */
 	private void setUpTopicSelection() {
-		JPanel topicSelectionPanel = new JPanel();
-		topicSelectionPanel.setLayout(new GridLayout(1,3));
 
 		//Build the JList for the selected paper's topics 
 		this.topicsAvailable = new JList();
 		JScrollPane availableScroll = new JScrollPane(topicsAvailable);
-		topicSelectionPanel.add(availableScroll);
+		availableScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		//availableScroll.setPreferredSize(new Dimension(topicListWidth, topicCardHeight));
 
-		setUpTopicSelectionButtons(topicSelectionPanel);
+		setUpTopicSelectionButtons();
 
 		//Builds the JList for the selected topics
 		this.topicsSelected = new JList();
 		JScrollPane selectedScroll = new JScrollPane(topicsSelected);
-		topicSelectionPanel.add(selectedScroll);
+		selectedScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		//selectedScroll.setPreferredSize(new Dimension(topicListWidth, topicCardHeight));
 
-		add(topicSelectionPanel, BorderLayout.WEST);
+		topicSelectionPanel = new TopicSelectionPanel(availableScroll, topicButtonPanel, 
+				selectedScroll);
+		topicSelectionPanel.setPreferredSize(new Dimension(topicSelectionWidth, topicCardHeight));
 	}
 
 	/**
 	 * Adds the buttons for choosing which topics to include in deck
 	 * @param topicSelectionPanel Panel to add the buttons to
 	 */
-	private void setUpTopicSelectionButtons(JPanel topicSelectionPanel) {
+	private void setUpTopicSelectionButtons() {
 		//creates a panel for the buttons
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(new GridLayout(0,1));//vertical list
+		topicButtonPanel = new JPanel();
+		topicButtonPanel.setLayout(new GridLayout(0,1));//vertical list
 
 		this.add = new JButton(addCommand);
 		this.remove =  new JButton(removeCommand);
@@ -142,11 +201,11 @@ ListSelectionListener
 		addAll.setEnabled(false);
 		removeAll.setEnabled(false);
 
-		buttonPanel.add(add);
-		buttonPanel.add(remove);
-		buttonPanel.add(addAll);
-		buttonPanel.add(removeAll);
-		topicSelectionPanel.add(buttonPanel);
+		topicButtonPanel.add(add);
+		topicButtonPanel.add(remove);
+		topicButtonPanel.add(addAll);
+		topicButtonPanel.add(removeAll);
+		//topicButtonPanel.setPreferredSize(new Dimension(topicButtonWidth, topicCardHeight));
 	}
 
 	/**
@@ -155,9 +214,10 @@ ListSelectionListener
 	private void setUpCardDisplay() {
 		this.cardDisplay = new JEditorPane();
 		this.cardDisplay.setEditable(false);
-		this.cardDisplay.setPreferredSize(new Dimension(400,400));
-		JScrollPane cardScroll = new JScrollPane(cardDisplay); 
-		add(cardScroll, BorderLayout.EAST);
+		this.cardDisplay.setPreferredSize(new Dimension(cardDisplayWidth, topicCardHeight));
+		cardDisplayPane = new JScrollPane(cardDisplay);
+		cardDisplayPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		cardDisplayPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	}
 
 	/**
@@ -192,7 +252,6 @@ ListSelectionListener
 	 */
 	private void setUpPaperSelecter(JPanel topPanel) {
 		//Retrieves the directories of each paper's folder
-		this.cardDir = new File(cardDirName);
 		this.paperList = this.cardDir.listFiles();
 
 		//Builds the String array for the combo box fro the names of the paper folders
