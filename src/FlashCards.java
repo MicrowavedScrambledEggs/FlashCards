@@ -20,7 +20,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 /**
  * Loads flash cards
- * 
+ *
  * @author Badi James
  * @version 1.0
  */
@@ -28,7 +28,7 @@ public class FlashCards extends JFrame implements ActionListener,
 ListSelectionListener
 {
 	private Card currentCard;
-	private ArrayList<Card> deck = new ArrayList<Card>();
+	private Deck deck = new Deck();
 	private File[] topicList;//array for list of topic directories
 	private File[] paperList;//array for list of paper directories
 	private String[] topicNameList;//array for list of topic directory Strings
@@ -51,7 +51,7 @@ ListSelectionListener
 	private JList topicsSelected;
 	private DefaultListModel<String> selectedTopicsStrings;
 	private DefaultListModel<File> selectedTopicsDirectories;
-	
+
 	private TopicSelectionPanel topicSelectionPanel;
 	private JPanel topicButtonPanel;
 	private JScrollPane cardDisplayPane;
@@ -72,34 +72,34 @@ ListSelectionListener
 
 
 	/**
-	 * Constructor for objects of class FlashCards. Sets up the buttons and initialises 
-	 * the card directory. Initialises the array of paper directories from the card 
-	 * directory's list of files. Starts the program off by asking the user to pick the 
+	 * Constructor for objects of class FlashCards. Sets up the buttons and initialises
+	 * the card directory. Initialises the array of paper directories from the card
+	 * directory's list of files. Starts the program off by asking the user to pick the
 	 * paper they want to study
 	 */
 	public FlashCards()
-	{	
+	{
 		super("Flash Cards");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
-		
+
 		if(findCards()){
 			setUpTopPanel();
-			setUpCardDisplayAndTopicSelection();      
+			setUpCardDisplayAndTopicSelection();
 			setUpActionListener();
 		}
 
 		this.pack();
 		this.setVisible(true);
 	}
-	
+
 	/**
 	 * Sets up the JSplitPane containing the Topic selection lists and buttons on one side and
 	 * the card display on the other side
 	 */
 	private void setUpCardDisplayAndTopicSelection() {
 		setUpCardDisplay();
-		setUpTopicSelection();  
+		setUpTopicSelection();
 		topicCardSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, topicSelectionPanel,
 				cardDisplayPane);
 		topicCardSplitPane.setDividerLocation(topicSelectionWidth);
@@ -116,7 +116,7 @@ ListSelectionListener
 			File runningDirectory = new File(FlashCards.class.getProtectionDomain()
 					.getCodeSource().getLocation().toURI().getPath());
 			runningDirectory = runningDirectory.getParentFile();
-			
+
 			//searches through the parent directory for the card folder
 			File[] runDirectoryContents = runningDirectory.listFiles();
 			for(int i = 0; i < runDirectoryContents.length; i++){
@@ -130,17 +130,17 @@ ListSelectionListener
 					+ "<br>Make sure folder \"" + cardDirName + "\" is in same folder as "
 					+ "FlashCards program</html>"));
 			return false;
-			
+
 		} catch (URISyntaxException e) {
 			add(new ErrorPanel("<html><b>ERROR:</b> when finding program directory to find "
 					+ "cards:<br>" + e.getMessage() +"</html>"));
 			return false;
 		}
-		
+
 	}
 
 	/**
-	 * Assigns event listeners to the buttons, combo boxes and lists  
+	 * Assigns event listeners to the buttons, combo boxes and lists
 	 */
 	private void setUpActionListener() {
 		draw.addActionListener(this);
@@ -163,7 +163,7 @@ ListSelectionListener
 	 */
 	private void setUpTopicSelection() {
 
-		//Build the JList for the selected paper's topics 
+		//Build the JList for the selected paper's topics
 		this.topicsAvailable = new JList();
 		JScrollPane availableScroll = new JScrollPane(topicsAvailable);
 		availableScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -177,7 +177,7 @@ ListSelectionListener
 		selectedScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		//selectedScroll.setPreferredSize(new Dimension(topicListWidth, topicCardHeight));
 
-		topicSelectionPanel = new TopicSelectionPanel(availableScroll, topicButtonPanel, 
+		topicSelectionPanel = new TopicSelectionPanel(availableScroll, topicButtonPanel,
 				selectedScroll);
 		topicSelectionPanel.setPreferredSize(new Dimension(topicSelectionWidth, topicCardHeight));
 	}
@@ -269,31 +269,18 @@ ListSelectionListener
 	}
 
 	/**
-	 * Goes through a paper directory, going into every topic folder, creates card objects from 
+	 * Goes through a paper directory, going into every topic folder, creates card objects from
 	 * the text files and adds them to the deck
-	 * 
-	 * Currently not in use ("Add All" logic fulfills this purpose) but might be useful for 
+	 *
+	 * Currently not in use ("Add All" logic fulfills this purpose) but might be useful for
 	 * future versions
 	 */
 	private void loadAllCardsForPaper(){
-		for(int i = 0; i < this.topicList.length; i++){
-			loadTopicCards(this.topicList[i]);
-		}
+		deck = new Deck(Arrays.asList(topicList));
 	}
 
 	/**
-	 * Goes through a topic folder, creates card objects from the text files and adds them to 
-	 * the deck
-	 */
-	private void loadTopicCards(File topicDir){
-		File[] topicCards = topicDir.listFiles();
-		for(int i = 0; i < topicCards.length; i++){
-			deck.add(new Card(topicCards[i]));
-		}
-	}
-
-	/**
-	 * Draws a random card from the deck. Sets that card to the current card and prints the 
+	 * Draws a random card from the deck. Sets that card to the current card and prints the
 	 * 'front' of it (the card's name and the topic it belongs to) to the card display area.
 	 */
 	private void draw(){
@@ -302,12 +289,12 @@ ListSelectionListener
 			pick = (int) (Math.random() * this.deck.size());
 		}
 		this.currentCard = this.deck.get(pick);
-		this.cardDisplay.setText(currentCard.getFront());  
+		this.cardDisplay.setText(currentCard.getFront());
 
 	}
 
 	/**
-	 * Prints the 'back' of the current card (the description of its subtopic) to the card 
+	 * Prints the 'back' of the current card (the description of its subtopic) to the card
 	 * display area, then removes it from the deck.
 	 */
 	private void flip(){
@@ -315,7 +302,7 @@ ListSelectionListener
 			this.cardDisplay.setText("Need to draw a card first");
 		} else {
 			this.cardDisplay.setText(currentCard.getBack());
-			this.deck.remove(this.currentCard); 
+			this.deck.remove(this.currentCard);
 		}
 	}
 
@@ -346,14 +333,14 @@ ListSelectionListener
 			}
 		}
 		else if(e.getActionCommand().equals(reshuffleCommand)){
-			rebuildDeck();
+			deck = Deck.rebuildDeck(selectedTopicsDirectories.elements());
 			draw.setEnabled(true);
 		}
 		else if(e.getActionCommand().equals(addAllCommand)){
 			for(int i = 0; i < topicList.length; i++){
 				addTopic(i);
-			}				
-		}		
+			}
+		}
 		else {
 			if(paperSelect.getSelectedIndex() < paperList.length){
 				displayTopics(this.paperSelect.getSelectedIndex());
@@ -368,27 +355,14 @@ ListSelectionListener
 	private void removeAllTopics() {
 		selectedTopicsStrings.removeAllElements();
 		selectedTopicsDirectories.removeAllElements();
-		deck = new ArrayList<Card>();
+		deck = new Deck();
 		draw.setEnabled(false);
 		reshuffle.setEnabled(false);
 		removeAll.setEnabled(false);
 	}
 
 	/**
-	 * Rebuilds the deck with the selected topics. Used for re-adding all the flipped cards
-	 * of the current deck
-	 */
-	private void rebuildDeck() {
-		if(!selectedTopicsDirectories.isEmpty()){
-			deck = new ArrayList<Card>();
-			for(int i = 0; i < selectedTopicsDirectories.getSize(); i++){
-				loadTopicCards(selectedTopicsDirectories.get(i));
-			}
-		}	
-	}
-
-	/**
-	 * Removes the currently selected topic in the selected topic JList from the selected 
+	 * Removes the currently selected topic in the selected topic JList from the selected
 	 * topic JList. Removes all cards from that topic from the deck
 	 */
 	private void removeTopic() {
@@ -402,24 +376,19 @@ ListSelectionListener
 
 		if(selectedTopicsStrings.isEmpty()){
 			//Clears the deck completely, now that there are no topics
-			deck = new ArrayList<Card>();
+			deck = new Deck();
 			draw.setEnabled(false);
 			reshuffle.setEnabled(false);
 			removeAll.setEnabled(false);
 		} else {
 			//Creates a replacement deck with all the cards from that topic removed
-			ArrayList<Card> newDeck = new ArrayList<Card>(deck);
-			for(Card c : deck){
-				if(c.getTopic().equals(topicName)){
-					newDeck.remove(c);
-				}
-			}
-			deck = newDeck;
+			deck = deck.removeTopic(topicName);
+
 		}
 	}
 
 	/**
-	 * Adds the topic in the topics available JList at the given index to the selected topics 
+	 * Adds the topic in the topics available JList at the given index to the selected topics
 	 * JList, and the topic's cards to the deck
 	 * @param topicIndex Index of selected topic in the topics available JList
 	 */
@@ -429,7 +398,7 @@ ListSelectionListener
 			//initialises the list models for the selected topics JList
 			selectedTopicsStrings = new DefaultListModel<String>();
 			selectedTopicsDirectories = new DefaultListModel<File>();
-			topicsSelected.setModel(selectedTopicsStrings); 
+			topicsSelected.setModel(selectedTopicsStrings);
 		}
 
 		String topicName = topicNameList[topicIndex];
@@ -438,7 +407,7 @@ ListSelectionListener
 			//Adds the topic to the selected topic's JList, and its cards to the deck
 			selectedTopicsStrings.addElement(topicName);
 			selectedTopicsDirectories.addElement(topicList[topicIndex]);
-			loadTopicCards(topicList[topicIndex]);
+			deck.loadTopicCards(topicList[topicIndex]);
 			draw.setEnabled(true);
 			reshuffle.setEnabled(true);
 			removeAll.setEnabled(true);
@@ -455,7 +424,7 @@ ListSelectionListener
 		this.topicList = this.paperList[selectedPaperIndex].listFiles();
 
 		//Build array of topic names, from topic directory array
-		this.topicNameList = new String[topicList.length];    
+		this.topicNameList = new String[topicList.length];
 		for(int i = 0; i < topicList.length; i++){
 			topicNameList[i] = topicList[i].getName();
 		}
