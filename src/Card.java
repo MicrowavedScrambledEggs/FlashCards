@@ -12,6 +12,7 @@ public class Card
 	private String topic;
 	private String subTopic;
 	private File cardFile;
+	private boolean isFlipped;
 
 	/**
 	 * Constructor for objects of class Card
@@ -53,7 +54,23 @@ public class Card
 	public String getSubtopic(){
 		return this.subTopic;
 	}
-
+	
+	public void flip(){
+		isFlipped = !isFlipped;
+	}
+	
+	public void setFlipped(boolean flipState){
+		isFlipped = flipState;
+	}
+	
+	public String viewCard(){
+		if(isFlipped){
+			return getBack();
+		} else {
+			return getFront();
+		}
+	}
+	
 	/**
 	 * @return String containing the paper, topic and subtopic this card belongs to
 	 */
@@ -61,7 +78,6 @@ public class Card
 		return String.format("%s\n\n%s\n\n%s", this.paper, this.topic, this.subTopic);
 	}
 
-	/**Prints on graphics pane the cards contents*/
 	public String getBack(){
 
 		try{
