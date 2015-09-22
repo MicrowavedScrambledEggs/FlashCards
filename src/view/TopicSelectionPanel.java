@@ -1,7 +1,10 @@
+package view;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -10,6 +13,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import main.Controller;
 
 /**
  * Panel to contain UI features relating to topic selection for the deck
@@ -22,31 +27,24 @@ import javax.swing.event.ListSelectionListener;
 public class TopicSelectionPanel extends JPanel implements ListSelectionListener{
 
 	private String[] topicNameList;//array for list of topic directory Strings
-	private File[] topicList;//array for list of topic directories
 
 	private JPanel topicButtonPanel;
-	private JList topicsAvailable;
-	private JList topicsSelected;
+	private JList<String> topicsAvailable;
+	private JList<String> topicsSelected;
 	private int divisionUnit = 18;
 	private int listProportion = 7;
 	private int buttonProportion = 4;
 	private JScrollPane availableScroll;
 	private JScrollPane selectedScroll;
 	private DefaultListModel<String> selectedTopicsStrings;
-	private DefaultListModel<File> selectedTopicsDirectories;
-	private Deck deck;
+	private DefaultListModel<String> topicsAvailableStrings;
 
-	private final String addCommand = "Add >>";
-	private final String removeCommand = "<< Remove";
-	private final String addAllCommand = "Add All >>";
-	private final String removeAllCommand = "<html>Remove<br>&lt&lt All</html>";
 	private JButton removeAll;
 	private JButton addAll;
 	private JButton remove;
 	private JButton add;
-
-	public TopicSelectionPanel(Deck deck){
-		this.deck = deck;
+	
+	public TopicSelectionPanel(){
 		setUpTopicSelection();
 	}
 
@@ -82,7 +80,10 @@ public class TopicSelectionPanel extends JPanel implements ListSelectionListener
 	private void setUpTopicSelection() {
 
 		//Build the JList for the selected paper's topics
-		this.topicsAvailable = new JList();
+		this.topicsAvailable = new JList<String>();
+		this.topicsAvailable.addListSelectionListener(this);
+		this.topicsAvailableStrings = new DefaultListModel<String>();
+		this.topicsAvailable.setModel(topicsAvailableStrings);
 		this.availableScroll = new JScrollPane(topicsAvailable);
 		availableScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		//availableScroll.setPreferredSize(new Dimension(topicListWidth, topicCardHeight));
@@ -90,7 +91,10 @@ public class TopicSelectionPanel extends JPanel implements ListSelectionListener
 		setUpTopicSelectionButtons();
 
 		//Builds the JList for the selected topics
-		this.topicsSelected = new JList();
+		this.topicsSelected = new JList<String>();
+		this.topicsSelected.addListSelectionListener(this);
+		this.selectedTopicsStrings = new DefaultListModel<String>();
+		this.topicsSelected.setModel(selectedTopicsStrings);
 		this.selectedScroll = new JScrollPane(topicsSelected);
 		selectedScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		//selectedScroll.setPreferredSize(new Dimension(topicListWidth, topicCardHeight));
@@ -106,10 +110,10 @@ public class TopicSelectionPanel extends JPanel implements ListSelectionListener
 		topicButtonPanel = new JPanel();
 		topicButtonPanel.setLayout(new GridLayout(0,1));//vertical list
 
-		this.add = new JButton(addCommand);
-		this.remove =  new JButton(removeCommand);
-		this.addAll = new JButton(addAllCommand);
-		this.removeAll = new JButton(removeAllCommand);
+		this.add = new JButton(Controller.addCommand);
+		this.remove =  new JButton(Controller.removeCommand);
+		this.addAll = new JButton(Controller.addAllCommand);
+		this.removeAll = new JButton(Controller.removeAllCommand);
 		//initialises buttons to disabled (need to select a paper before they can do anything)
 		add.setEnabled(false);
 		remove.setEnabled(false);
@@ -128,8 +132,6 @@ public class TopicSelectionPanel extends JPanel implements ListSelectionListener
 	 */
 	private void removeAllTopics() {
 		selectedTopicsStrings.removeAllElements();
-		selectedTopicsDirectories.removeAllElements();
-		deck = new Deck();
 		removeAll.setEnabled(false);
 	}
 
@@ -162,10 +164,10 @@ public class TopicSelectionPanel extends JPanel implements ListSelectionListener
 		int buttonWidth = widthDivision*buttonProportion;
 		Dimension listDimension = new Dimension(listWidth, height);
 		Dimension buttonDimension = new Dimension(buttonWidth, height);
-		this.topicsAvailable.setSize(listDimension);
-		this.topicsAvailable.setPreferredSize(listDimension);
-		this.topicsSelected.setSize(listDimension);
-		this.topicsSelected.setPreferredSize(listDimension);
+		availableScroll.setSize(listDimension);
+		availableScroll.setPreferredSize(listDimension);
+		selectedScroll.setSize(listDimension);
+		selectedScroll.setPreferredSize(listDimension);
 		this.topicButtonPanel.setSize(buttonDimension);
 		this.topicButtonPanel.setPreferredSize(buttonDimension);
 	}
@@ -201,25 +203,6 @@ public class TopicSelectionPanel extends JPanel implements ListSelectionListener
 	}
 
 	/**
-	 * Sets the topics available JList to contain and display the names of the topics of the
-	 * selected paper
-	 * @param paperTopics array of topic folders
-	 */
-	public void displayTopics(File[] paperTopics){
-		//build array of topic directories for paper
-		this.topicList = paperTopics;
-
-		//Build array of topic names, from topic directory array
-		this.topicNameList = new String[topicList.length];
-		for(int i = 0; i < topicList.length; i++){
-			topicNameList[i] = topicList[i].getName();
-		}
-
-		this.topicsAvailable.setListData(topicNameList);
-		this.addAll.setEnabled(true);
-	}
-
-	/**
 	 * Adds the topic in the topics available JList at the given index to the selected topics
 	 * JList, and the topic's cards to the deck
 	 * @param topicIndex Index of selected topic in the topics available JList
@@ -229,7 +212,6 @@ public class TopicSelectionPanel extends JPanel implements ListSelectionListener
 			//if this is the first time a topic has been selected
 			//initialises the list models for the selected topics JList
 			selectedTopicsStrings = new DefaultListModel<String>();
-			selectedTopicsDirectories = new DefaultListModel<File>();
 			topicsSelected.setModel(selectedTopicsStrings);
 		}
 
@@ -238,8 +220,6 @@ public class TopicSelectionPanel extends JPanel implements ListSelectionListener
 			//if selected topic is not already in the selected topics JList
 			//Adds the topic to the selected topic's JList, and its cards to the deck
 			selectedTopicsStrings.addElement(topicName);
-			selectedTopicsDirectories.addElement(topicList[topicIndex]);
-			deck.loadTopicCards(topicList[topicIndex]);
 			removeAll.setEnabled(true);
 		}
 	}
@@ -255,17 +235,49 @@ public class TopicSelectionPanel extends JPanel implements ListSelectionListener
 
 		//Remove that topic from the selected topic JList
 		selectedTopicsStrings.remove(topicIndex);
-		selectedTopicsDirectories.remove(topicIndex);
-
 		if(selectedTopicsStrings.isEmpty()){
 			//Clears the deck completely, now that there are no topics
-			deck = new Deck();
 			removeAll.setEnabled(false);
-		} else {
-			//Creates a replacement deck with all the cards from that topic removed
-			deck = deck.removeTopic(topicName);
-
 		}
+	}
+
+	public String getSelectedTopicToAdd() {
+		return this.topicsAvailable.getSelectedValue();
+	}
+
+	public String getSelectedTopicToRemove() {
+		return this.topicsSelected.getSelectedValue();
+	}
+
+	public void setSelectedTopicsList(ArrayList<String> topicsInDeck) {
+		this.selectedTopicsStrings = new DefaultListModel<String>();
+		for(String topic : topicsInDeck){
+			selectedTopicsStrings.addElement(topic);
+		}	
+		this.topicsSelected.setModel(selectedTopicsStrings);
+	}
+
+	public void setRemoveAll(boolean b) {
+		this.removeAll.setEnabled(b);
+	}
+
+	public void setAddAll(boolean b) {
+		this.addAll.setEnabled(b);
+	}
+
+	public void addActionListener(ActionListener actionListener) {
+		add.addActionListener(actionListener);
+		remove.addActionListener(actionListener);
+		addAll.addActionListener(actionListener);
+		removeAll.addActionListener(actionListener);
+	}
+
+	public void setTopicsToAddList(ArrayList<String> topicNameList) {
+		this.topicsAvailableStrings = new DefaultListModel<String>();
+		for(String topic : topicNameList){
+			topicsAvailableStrings.addElement(topic);
+		}
+		this.topicsAvailable.setModel(topicsAvailableStrings);
 	}
 
 

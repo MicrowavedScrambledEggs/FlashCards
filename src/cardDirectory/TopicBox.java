@@ -1,4 +1,8 @@
+package cardDirectory;
 import java.io.File;
+
+import cardLogic.Card;
+import cardLogic.Deck;
 
 
 public class TopicBox {

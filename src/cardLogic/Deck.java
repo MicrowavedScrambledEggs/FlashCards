@@ -1,3 +1,4 @@
+package cardLogic;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,18 +35,6 @@ public class Deck extends ArrayList<Card> {
 		for(int i = 0; i < topicCards.length; i++){
 			add(new Card(topicCards[i]));
 		}
-	}
-
-	/**
-	 * Rebuilds the deck with the selected topics. Used for re-adding all the flipped cards
-	 * of the current deck
-	 */
-	public static Deck rebuildDeck(Enumeration<File> selectedTopicsDirectories) {
-		Deck rebuiltDeck = new Deck();
-		while(selectedTopicsDirectories.hasMoreElements()){
-			rebuiltDeck.loadTopicCards(selectedTopicsDirectories.nextElement());
-		}
-		return rebuiltDeck;
 	}
 
 	public Deck removeTopic(String topicName) {

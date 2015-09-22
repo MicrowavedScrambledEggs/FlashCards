@@ -1,3 +1,4 @@
+package cardDirectory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +32,24 @@ public class CardCrate {
 	
 	public PaperBox getPaper(int index){
 		return cardPapers.get(index);
+	}
+	
+	public boolean containsPaper(String paperName){
+		for(PaperBox paper : cardPapers){
+			if(paper.getPaperName().equals(paperName)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public PaperBox getPaper(String paperName) {
+		for(PaperBox paper : cardPapers){
+			if(paper.getPaperName().equals(paperName)){
+				return paper;
+			}
+		}
+		return null;
 	}
 	
 }

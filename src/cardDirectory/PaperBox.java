@@ -1,3 +1,4 @@
+package cardDirectory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,8 +34,21 @@ public class PaperBox {
 		return paperTopics.get(index);
 	}
 	
+	public ArrayList<TopicBox> getAllTopics(){
+		return paperTopics;
+	}
+	
 	public String getPaperName(){
 		return paperDirectory.getName();
+	}
+
+	public TopicBox getTopic(String topicName) {
+		for(TopicBox topic : paperTopics){
+			if(topic.getTopicName().equals(topicName)){
+				return topic;
+			}
+		}
+		return null;
 	}
 	
 }

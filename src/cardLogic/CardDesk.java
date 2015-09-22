@@ -1,4 +1,8 @@
+package cardLogic;
 import java.util.ArrayList;
+
+import cardDirectory.PaperBox;
+import cardDirectory.TopicBox;
 
 
 public class CardDesk {
@@ -20,9 +24,15 @@ public class CardDesk {
 		}
 	}
 	
+	public void addAllTopicsFromPaper(PaperBox paper){
+		for(TopicBox topic : paper.getAllTopics()){
+			addTopic(topic);
+		}
+	}
+	
 	private void removeTopicFromDecks(String topicName){
-		grandDeck.removeTopic(topicName);
-		discardPile.removeTopic(topicName);
+		grandDeck = grandDeck.removeTopic(topicName);
+		discardPile = discardPile.removeTopic(topicName);
 		if(currentCard != null && currentCard.getTopic().equals(topicName)){
 			currentCard = null;
 		}
@@ -88,6 +98,7 @@ public class CardDesk {
 	
 	public void discardCurrentCard(){
 		if(currentCard != null){
+			currentCard.setFlipped(false);
 			discardPile.add(currentCard);
 			grandDeck.remove(currentCard);
 			currentCard = null;
@@ -95,9 +106,13 @@ public class CardDesk {
 	}
 	
 	public void resetGrandDeck(){
+		discardCurrentCard();
 		grandDeck.addAll(discardPile);
 		discardPile = new Deck();
-		currentCard = null;
+	}
+
+	public boolean allCardsDiscarded() {
+		return grandDeck.isEmpty();
 	}
 	
 }
