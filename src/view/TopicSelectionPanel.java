@@ -3,7 +3,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
@@ -127,14 +126,6 @@ public class TopicSelectionPanel extends JPanel implements ListSelectionListener
 		//topicButtonPanel.setPreferredSize(new Dimension(topicButtonWidth, topicCardHeight));
 	}
 
-	/**
-	 * Clears the selected topic JList and empties the deck
-	 */
-	private void removeAllTopics() {
-		selectedTopicsStrings.removeAllElements();
-		removeAll.setEnabled(false);
-	}
-
 	@Override
 	public void setPreferredSize(Dimension d){
 		super.setPreferredSize(d);
@@ -231,7 +222,6 @@ public class TopicSelectionPanel extends JPanel implements ListSelectionListener
 	public void removeTopic() {
 		//Get the selected topic's name
 		int topicIndex = topicsSelected.getSelectedIndex();
-		String topicName = selectedTopicsStrings.get(topicIndex);
 
 		//Remove that topic from the selected topic JList
 		selectedTopicsStrings.remove(topicIndex);
